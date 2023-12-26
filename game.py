@@ -104,7 +104,7 @@ class PlinkoGame:
             all it does is return seq[int(self.random() * len(seq))]  
             # raises IndexError if seq is empty (exact code from 2.7.2)
             """
-            #coin flip +1/-1
+            #coin flip 50/50
             counter += random.choice([-.5, .5])
 
         counter = int(counter)
