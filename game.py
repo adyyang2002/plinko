@@ -1,5 +1,6 @@
 import locale
 import random
+import math
 
 class PlinkoGame:
     def __init__(self, initial_balance=0):
@@ -75,23 +76,30 @@ class PlinkoGame:
             except ValueError:
                 print("Invalid input. Please enter [Y] or [N].")
 
+    def generate_buckets(self, buckets, num_rows, risk):
+        max_val = num_rows * ((num_rows - 1) / (num_rows + 1)) # Maximum value #rows times risk times rows * risk
+        min_val = math.sqrt(num_rows) / (num_rows) 
+        mid_index = (buckets - 1) // 2
+        a = (max_val - min_val) # scaling factor
+        b = (min_val / max_val) ** (1 / mid_index)# base for exponential decrease
+
+        first_half = [
+            round((a * b ** i + min_val - .1) ** (risk - risk * .1), 1)
+            for i in range(mid_index + 1)
+        ]
+
+        if buckets % 2 == 0:
+            second_half = first_half[::-1]
+        else:
+            second_half = first_half[-2::-1]
+
+        return first_half + second_half
 
     def score_game(self, bet, risk, num_rows):
-        #generates the buckets and calculates the risk of each bucket
-        #note: might need to seperate generating the buckets and applying the risk
-        bucket_list = []
         buckets = num_rows + 1
-        counter = buckets * risk * risk
-        multiplier = (risk + 1) * .8
-        for x in range(buckets):
-            if x < buckets/2:
-                counter = counter / multiplier
-            elif x == buckets/2:
-                continue
-            else:
-                counter = counter * multiplier
-            bucket_list.append(round(counter, 1))
+        bucket_list = self.generate_buckets(buckets, num_rows, risk)
         print(bucket_list)
+
         # determines where the ball ends up
         if num_rows % 2 == 0:
             counter = 0
